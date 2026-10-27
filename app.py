@@ -33,14 +33,20 @@ col1, col2 = st.columns([1, 1])
 
 with col1:
     st.subheader("📋 Client Job Details")
-    client_name = st.text_input("Client / Company Name (Optional):", placeholder="e.g. Flour Mills PLC, TechCorp")
-    job_title = st.text_input("Job Role / Project Title:", placeholder="e.g. Senior Machine Learning Engineer")
-    job_desc = st.text_area("Paste Client Job Description or Requirements:", height=200,
+    client_name = st.text_input(label="Client / Company Name (Optional):",
+                                placeholder="e.g., Flour Mills PLC, TechCorp")
+    job_title = st.text_input(label="Job Role / Project Title:", placeholder="e.g., Senior Machine Learning Engineer")
+    job_desc = st.text_area(label="Paste Client Job Description or Requirements:",
                             placeholder="Paste job specs here...")
-    # --- ADD NEW FIELDS HERE IN COL1 ---
+
+    # --- NEW FIELDS IN COL1 ---
     project_duration = st.text_input("Project Duration / Timeline:", placeholder="e.g., 8 Weeks / 3 Months")
     estimated_budget = st.text_input("Estimated Budget / Pricing Model:", placeholder="e.g., Per-term Retainer")
-    generate_btn = st.button("🚀 Match Portfolio & Generate Proposal", type="primary")
+
+    generate_btn = st.button(label="🚀 Match Portfolio & Generate Proposal", type="primary")
+
+with col2:
+    st.subheader("🎯 Match Analysis & Output")
 
     if generate_btn:
         if job_desc:
@@ -53,16 +59,13 @@ with col1:
                     estimated_budget
                 )
                 st.markdown(proposal_output)
+                st.success("Proposal ready to send and download!")
+
+                st.download_button(
+                    label="📥 Download Proposal (.txt)",
+                    data=proposal_output,
+                    file_name=f"Proposal_{client_name.replace(' ', '_') if client_name else 'Client'}.txt",
+                    mime="text/plain"
+                )
         else:
             st.warning("Please paste the client job description or requirements first.")
-            # --- NEW: Export / Download Button ---
-            st.download_button(
-                label="📥 Download Proposal (.txt)",
-                data=proposal_output,  # <--- Change 'proposal' to 'proposal_output' here
-                file_name=f"Proposal_{client_name.replace(' ', '_') if client_name else 'Client'}.txt",
-                mime="text/plain"
-            )
-
-                st.success("Proposal ready to send and download!")
-        else:
-            st.error("Please enter both the Job Title and Job Description to proceed.")
