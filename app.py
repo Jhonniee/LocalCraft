@@ -74,7 +74,7 @@ with col1:
     estimated_budget = st.text_input("Estimated Budget / Pricing Model:", placeholder="e.g., ₦150,000 / term")
 
     # Strategy 3: Equipment Breakout Feature
-    hardware_kits = st.number_input("Hardware Kits to Allocate (LEGO SPIKE/Microcontrollers):", min_value=0, value=2)
+    equipment_units = st.number_input("Hardware / Equipment Kits Allocated (Optional):", min_value=0, value=0)
 
     # Strategy 2: Enterprise White-Label Branding Field
     org_name = "LeadCraft Partner"
@@ -98,13 +98,18 @@ with col2:
                     st.session_state.credits -= 1
 
                 proposal_text, match_score = engine.generate_tailored_proposal(
-                    client_name, job_title, job_desc, project_duration, estimated_budget, hardware_kits, org_name
+                    client_name=client_name,
+                    project_title=job_title,
+                    client_requirements=job_desc,
+                    duration=project_duration,
+                    budget=estimated_budget,
+                    equipment_units=equipment_units,
+                    organization_name=org_name
                 )
 
                 st.metric(label="Match Relevance Index", value=f"{match_score}% Alignment")
                 st.code(proposal_text, language="markdown")
 
-                # PDF Generation
                 pdf_bytes = engine.generate_pdf_proposal(proposal_text)
 
                 st.download_button(
