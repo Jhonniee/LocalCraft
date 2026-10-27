@@ -37,7 +37,9 @@ with col1:
     job_title = st.text_input("Job Role / Project Title:", placeholder="e.g. Senior Machine Learning Engineer")
     job_desc = st.text_area("Paste Client Job Description or Requirements:", height=200,
                             placeholder="Paste job specs here...")
-
+    # --- ADD NEW FIELDS HERE IN COL1 ---
+    project_duration = st.text_input("Project Duration / Timeline:", placeholder="e.g., 8 Weeks / 3 Months")
+    estimated_budget = st.text_input("Estimated Budget / Pricing Model:", placeholder="e.g., Per-term Retainer")
     generate_btn = st.button("🚀 Match Portfolio & Generate Proposal", type="primary")
 
 with col2:
