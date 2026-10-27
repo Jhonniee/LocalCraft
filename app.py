@@ -42,28 +42,26 @@ with col1:
     estimated_budget = st.text_input("Estimated Budget / Pricing Model:", placeholder="e.g., Per-term Retainer")
     generate_btn = st.button("🚀 Match Portfolio & Generate Proposal", type="primary")
 
-with col2:
-    st.subheader("🎯 Match Analysis & Output")
-
     if generate_btn:
-        if job_desc and job_title:
-            with st.spinner("Analyzing semantics & ranking portfolio match..."):
-                match = engine.find_best_match(job_desc)
-                proposal = engine.generate_winning_proposal(client_name, job_title, job_desc, match)
-
-                st.metric(label="Top Relevant Project Match", value=match['title'],
-                          delta=f"{match['score']}% Match Confidence")
-
-                st.markdown("### Generated Proposal Copy")
-                st.code(proposal, language="markdown")
-
-                # --- NEW: Export / Download Button ---
-                st.download_button(
-                    label="📥 Download Proposal (.txt)",
-                    data=proposal,
-                    file_name=f"Proposal_{client_name.replace(' ', '_') if client_name else 'Client'}.txt",
-                    mime="text/plain"
+        if job_desc:
+            with st.spinner("Analyzing requirements and generating proposal..."):
+                proposal_output = engine.generate_tailored_proposal(
+                    client_name,
+                    job_title,
+                    job_desc,
+                    project_duration,
+                    estimated_budget
                 )
+                st.markdown(proposal_output)
+        else:
+            st.warning("Please paste the client job description or requirements first.")
+            # --- NEW: Export / Download Button ---
+            st.download_button(
+                label="📥 Download Proposal (.txt)",
+                data=proposal_output,  # <--- Change 'proposal' to 'proposal_output' here
+                file_name=f"Proposal_{client_name.replace(' ', '_') if client_name else 'Client'}.txt",
+                mime="text/plain"
+            )
 
                 st.success("Proposal ready to send and download!")
         else:
