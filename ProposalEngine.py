@@ -5,20 +5,27 @@ import pandas as pd
 
 class LeadCraftEngine:
     def __init__(self, portfolio=None):
-        # Sample portfolio or core competencies database
-        if portfolio is not None:
-            self.portfolio_projects = portfolio
-        else:
-            self.portfolio_projects = [
-                "Hands-on LEGO SPIKE robotics and coding curriculum for middle school students focusing on microcontrollers and sensors.",
-                "B2B technical training bootcamps and STEM lab setup for private educational institutions.",
-                "Python automation, data literacy, and software logic training for institutional teams."
-            ]
+        raw_portfolio = portfolio if portfolio is not None else [
+            "Hands-on LEGO SPIKE robotics and coding curriculum for middle school students focusing on microcontrollers and sensors.",
+            "B2B technical training bootcamps and STEM lab setup for private educational institutions.",
+            "Python automation, data literacy, and software logic training for institutional teams."
+        ]
+
+        # Normalize portfolio items to always be strings (handles dicts or strings safely)
+        self.portfolio_projects = []
+        for item in raw_portfolio:
+            if isinstance(item, dict):
+                # Extract text description if portfolio items are dictionaries
+                text = item.get("description", item.get("desc", str(item)))
+                self.portfolio_projects.append(text)
+            else:
+                self.portfolio_projects.append(str(item))
+
         self.vectorizer = TfidfVectorizer()
 
     def calculate_match_score(self, client_requirements):
         """Uses TF-IDF to calculate relevance score between client needs and your portfolio."""
-        corpus = self.portfolio_projects + [client_requirements]
+        corpus = self.portfolio_projects + [str(client_requirements)]
         tfidf_matrix = self.vectorizer.fit_transform(corpus)
 
         # Calculate cosine similarity between the last document (client needs) and portfolio
