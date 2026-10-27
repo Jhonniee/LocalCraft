@@ -6,16 +6,18 @@ import pandas as pd
 class LeadCraftEngine:
     def __init__(self, portfolio=None):
         raw_portfolio = portfolio if portfolio is not None else [
-            "Hands-on LEGO SPIKE robotics and coding curriculum for middle school students focusing on microcontrollers and sensors.",
-            "B2B technical training bootcamps and STEM lab setup for private educational institutions.",
-            "Python automation, data literacy, and software logic training for institutional teams."
+            "Hands-on LEGO SPIKE Prime and SPIKE Essential robotics curriculum for middle school and high school students focusing on microcontrollers, sensors, and mechanical assembly.",
+            "B2B technical training bootcamps, instructor training, and STEM lab setup for private educational institutions and academies.",
+            "Python automation, data literacy, and software logic training for institutional teams and students.",
+            "Java programming and Object-Oriented Programming (OOP) fundamentals training, software logic structuring, and practical coding exercises.",
+            "Information technology fundamentals, networking basics, and structured technical support training programs for schools and corporate organizations.",
+            "Custom STEM project-based learning design, student progress reporting frameworks, and final showcase project mentorship."
         ]
 
         # Normalize portfolio items to always be strings (handles dicts or strings safely)
         self.portfolio_projects = []
         for item in raw_portfolio:
             if isinstance(item, dict):
-                # Extract text description if portfolio items are dictionaries
                 text = item.get("description", item.get("desc", str(item)))
                 self.portfolio_projects.append(text)
             else:
