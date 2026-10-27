@@ -1,6 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import pandas as pd
+from fpdf import FPDF
+import io
 
 
 class LeadCraftEngine:
@@ -14,7 +15,6 @@ class LeadCraftEngine:
             "Custom STEM project-based learning design, student progress reporting frameworks, and final showcase project mentorship."
         ]
 
-        # Normalize portfolio items to always be strings (handles dicts or strings safely)
         self.portfolio_projects = []
         for item in raw_portfolio:
             if isinstance(item, dict):
@@ -26,39 +26,69 @@ class LeadCraftEngine:
         self.vectorizer = TfidfVectorizer()
 
     def calculate_match_score(self, client_requirements):
-        """Uses TF-IDF to calculate relevance score between client needs and your portfolio."""
         corpus = self.portfolio_projects + [str(client_requirements)]
         tfidf_matrix = self.vectorizer.fit_transform(corpus)
-
-        # Calculate cosine similarity between the last document (client needs) and portfolio
         similarity_scores = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1])
         best_score = float(similarity_scores.max()) * 100
         return round(best_score, 2)
 
-    def generate_tailored_proposal(self, client_name, project_title, client_requirements, duration, budget):
+    def generate_tailored_proposal(self, client_name, project_title, client_requirements, duration, budget,
+                                   hardware_kits=0, organization_name="LeadCraft AI Partner"):
         match_score = self.calculate_match_score(client_requirements)
 
+        hardware_section = ""
+        if hardware_kits > 0:
+            hardware_section = f"""
+## 3. Hardware Deployment & Logistics
+* **Robotics/STEM Kits Allocated:** {hardware_kits} Reusable Kit(s) (LEGO SPIKE / Microcontrollers)
+* **Logistics & Asset Assurance:** Equipment provided under institutional loan agreement with maintenance support included.
+"""
+
         proposal = f"""
-# COMMERCIAL PROPOSAL & SERVICE AGREEMENT
-**Prepared for:** {client_name if client_name else "Valued Institutional Partner"}  
-**Project Scope:** {project_title}  
-**Match Relevance Index:** {match_score}% Alignment  
+================================================================================
+                            COMMERCIAL PROPOSAL
+                             {organization_name.upper()}
+================================================================================
 
----
+Prepared for: {client_name if client_name else "Valued Institutional Partner"}  
+Project Scope: {project_title}  
+Match Relevance Index: {match_score}% Technical Alignment  
 
-## 1. Executive Summary
-We are pleased to submit this tailored technical service proposal for **{client_name if client_name else "your organization"}**. Based on your requirements (*"{client_requirements[:100]}..."*), our framework delivers high-impact, practical execution designed to bridge the technical learning and operational gap efficiently.
+--------------------------------------------------------------------------------
+1. EXECUTIVE SUMMARY
+--------------------------------------------------------------------------------
+We are pleased to submit this commercial technical proposal for {client_name if client_name else "your organization"}.
+Based on your requirements:
+"{client_requirements[:120]}..."
 
-## 2. Proposed Timeline & Delivery Structure
-* **Estimated Duration:** {duration if duration else "Flexible / Structured per Term"}
-* **Execution Model:** On-site practical facilitation combined with continuous progress tracking and milestone reviews.
-* **Resource Commitment:** Fully equipped with reusable hardware assets, standardized curriculum modules, and dedicated instruction.
+Our framework delivers practical, high-impact facilitation engineered to bridge institutional 
+learning gaps and optimize operational productivity.
 
-## 3. Financial Framework & Investment
-* **Pricing Model:** {budget if budget else "Competitive B2B Retainer / Term-based Structure"}
-* **Value Assurance:** Asset-light deployment ensures minimal institutional overhead while maximizing student/operational engagement.
+--------------------------------------------------------------------------------
+2. PROPOSED TIMELINE & DELIVERY STRUCTURE
+--------------------------------------------------------------------------------
+* Estimated Duration: {duration if duration else "Flexible / Term-based"}
+* Execution Model: On-site practical facilitation, continuous evaluation, and project showcases.
+{hardware_section}
+--------------------------------------------------------------------------------
+4. FINANCIAL FRAMEWORK & INVESTMENT
+--------------------------------------------------------------------------------
+* Pricing Structure: {budget if budget else "Competitive Retainer Model"}
+* Value Assurance: Asset-light deployment ensures minimal institutional overhead while maximizing outcome quality.
 
-## 4. Next Steps
-To confirm this engagement and schedule setup, we propose a brief alignment meeting to review equipment readiness and finalize the implementation calendar.
-        """
-        return proposal
+--------------------------------------------------------------------------------
+5. NEXT STEPS & ENGAGEMENT
+--------------------------------------------------------------------------------
+To confirm this scope, we propose an initial alignment session to map schedule dates and hardware deployment.
+"""
+        return proposal, match_score
+
+    def generate_pdf_proposal(self, text_proposal):
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=11)
+
+        for line in text_proposal.split('\n'):
+            pdf.cell(0, 6, txt=line.encode('latin-1', 'replace').decode('latin-1'), ln=True)
+
+        return pdf.output(dest='S').encode('latin-1')
